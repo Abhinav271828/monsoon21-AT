@@ -18,3 +18,12 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
                 - Regular Languages
                     - Regular Operations
                     - Regular Expressions
+* Week 3
+    - Lecture 3 (14 October, Thursday)
+        - Models of Computation
+            - Non-Deterministic Finite Automata (contd.)
+                - Converting DFAs to Regular Expressions
+                - The Pumping Lemma
+            - Grammars
+                - Definition
+                - Linear Grammars
