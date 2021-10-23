@@ -31,3 +31,8 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
         - Models of Computation
             - Grammars (contd.)
                 - Context-Free Grammars
+    - Lecture 5 (21 October, Thursday)
+        - Models of Computation
+            - Grammars (contd.)
+                - Chomsky Normal Form
+                - Pushdown Automata
