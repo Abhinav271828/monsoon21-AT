@@ -36,3 +36,8 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
             - Grammars (contd.)
                 - Chomsky Normal Form
                 - Pushdown Automata
+* Week 4
+    - Lecture 6 (25 October, Monday)
+        - Models of Computation
+            - Grammars
+                - Pushdown Automata (contd.)
