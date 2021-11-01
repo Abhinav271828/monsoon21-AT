@@ -41,3 +41,9 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
         - Models of Computation
             - Grammars
                 - Pushdown Automata (contd.)
+* Week 5
+    - Lecture 7 (01 November, Monday)
+        - Models of Computation
+            - Grammars
+                - Pushdown Automata (contd.)
+                - Deterministic PDAs
