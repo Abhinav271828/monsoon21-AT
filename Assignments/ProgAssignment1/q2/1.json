@@ -1,0 +1,14 @@
+{
+  axiom: 'FXFYF' ,
+  productions:
+  {
+    'X': '[+FXFYF]FXFY' ,
+    'Y': '[-FXFYF]FXFY'
+  } ,
+  finals: 
+  {
+    '+': Angle: 30 ,
+    '-': Angle: -30 ,
+    'F': Move
+  }
+}

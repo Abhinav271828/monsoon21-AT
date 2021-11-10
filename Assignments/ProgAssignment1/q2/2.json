@@ -1,0 +1,13 @@
+{
+  axiom: 'F' ,
+  productions:
+  {
+    'F': 'F-F++F-F' ,
+  } ,
+  finals: 
+  {
+    '+': Angle: 60 ,
+    '-': Angle: -60 ,
+    'F': Move
+  }
+}
