@@ -47,3 +47,9 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
             - Grammars
                 - Pushdown Automata (contd.)
                 - Deterministic PDAs
+* Week 6
+    - Lecture 8 (08 November, Monday)
+        - Models of Computation
+            - Grammars (contd.)
+                - The Pumping Lemma for CFLs
+                - Closure Properties of CFLs
