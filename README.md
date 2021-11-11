@@ -53,3 +53,6 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
             - Grammars (contd.)
                 - The Pumping Lemma for CFLs
                 - Closure Properties of CFLs
+    - Lecture 9 (11 November, Thursday)
+        - Models of Computation (contd.)
+            - Turing Machines
