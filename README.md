@@ -56,3 +56,9 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
     - Lecture 9 (11 November, Thursday)
         - Models of Computation (contd.)
             - Turing Machines
+* Week 7
+    - Lecture 10 (15 November, Monday)
+        - Models of Computation
+            - Turing Machines (contd.)
+                - Decidable and Recognisable Languages
+                - Variants of Turing Machines
