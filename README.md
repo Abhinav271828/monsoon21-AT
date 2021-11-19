@@ -62,3 +62,10 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
             - Turing Machines (contd.)
                 - Decidable and Recognisable Languages
                 - Variants of Turing Machines
+    - Lecture 11 (18 November, Thursday)
+        - Models of Computation
+            - Turing Machines (contd.)
+                - Enumerators
+                - Encoding
+                - Some Decidable Languages
+                - Some Undecidable Languages
