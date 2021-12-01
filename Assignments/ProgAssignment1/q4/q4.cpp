@@ -1,228 +1,234 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <string>
 #include <utility>
 #include <set>
-#include <stack>
-
 using namespace std;
-
 typedef pair<pair<int,char>,int> transition;
 
-
-struct Regex
+struct Regex                //Regex datatype
 {
-    string symb;
+    char *symb;             //single symbol OR ε
+    Regex *star;            //Kleene star of a regex
+    vector<Regex> *plus;    //union of n regexes
+    vector<Regex> *conc;    //concat of n regexes
 
-    Regex* star;
-    vector<Regex>* concat;
-    vector<Regex>* plus;
-
-    Regex (string);
-    Regex ();
-
-    pair<vector<Regex>,string> parse (vector<Regex>, string);
-    
-    int isEmpty();
-    int isStar();
-    int isPlus();
-    int isConc();
-    int isChar();
-    void show();
-
-    void reduce (vector<Regex>);
-
+    Regex (char*, Regex*, vector<Regex>*, vector<Regex>*);  //constructor
+    void show();                                            //printer
 };
-void showvec(vector<Regex>);
 
-void Regex::reduce (vector<Regex> st)
+Regex::Regex (char* s, Regex* st, vector<Regex>* pl, vector<Regex>* c)
 {
-    cout << "In reduce" << endl;
-    
-    cout << "Passed "; showvec(st); cout << endl;
-    reverse(st.begin(),st.end());
-    cout << "Reversed? "; showvec(st); cout << endl;
-    concat = &st;
+    symb = s; star = st; plus = pl; conc = c;   //assignment
 }
 
-Regex::Regex ()
+void Regex::show ()
 {
-    symb = ""; star = NULL; concat = NULL; plus = NULL;
-}
-
-Regex::Regex (string r)
-{
-    cout << "Creating new with " << r << "; parsing" << endl;
-
-    vector<Regex> st;
-    pair<vector<Regex>,string> ret = parse(st,r);
-    cout << "Parsed" << endl;
-
-    vector<Regex> p = ret.first;
-    if (ret.second != "")
+    if (star != NULL)
     {
-        cout << "Error; no parse" << endl;
-        return;
-    }
-
-    symb = ""; star = NULL; plus = NULL;
-
-    cout << "About to reduce" << endl;
-    showvec(p); cout << endl;
-    reduce(p);
-    cout << "Reduced" << endl;
-}
-
-pair<vector<Regex>,string> Regex::parse (vector<Regex> st, string r)
-{
-
-    cout << "Parsing;" << endl
-         << "first symbol " << r[0] << endl
-         << "stack " << endl << "  "; showvec(st);
-
-    if (r == "")
-    {
-        cout << "R empty; returning stack ";
-        showvec(st); cout << endl;
-        return make_pair(st,"");
-    }
-
-    if ((r[0] >= 'a' && r[0] <= 'z') || (r[0] == 'E'))
-    {
-        Regex p; p.symb.append(1,r[0]);
-        st.push_back(p); r.erase(r.begin());
-
-        cout << "Now stack is " << endl; showvec(st);
-        cout << endl << "and r is " << r << endl;
-
-        pair<vector<Regex>,string> ret = parse(st, r);
-        cout << "Returning stack "; showvec(ret.first); cout << endl;
-        cout << "with string " << ret.second << endl;
-        return ret;
-    }
-    else if (r[0] == '*')
-    {
-        Regex c = st.back(); st.pop_back();
-        Regex p; p.star = &c;
-        st.push_back(p); r.erase(r.begin());
-
-        cout << "Now stack is " << endl; showvec(st);
-        cout << endl << "and r is " << r << endl;
-
-        pair<vector<Regex>,string> ret = parse(st, r);
-        cout << "Returning stack "; showvec(ret.first); cout << endl;
-        cout << "with string " << ret.second << endl;
-        return ret;
-    }
-    else if (r[0] == '+')
-    {
-        Regex c = st.back(); st.pop_back();
-
-        r.erase(r.begin()); vector<Regex> emp;
-        pair<vector<Regex>,string> op = parse(emp,r);
-
-        Regex p; p.reduce(op.first);
-
-        if (c.isPlus())
-        {
-            (*(c.plus)).push_back(p);
-            st.push_back(c);
-        }
-        else
-        {
-            Regex pl; vector<Regex> v;
-            v.push_back(c); v.push_back(p);
-            pl.plus = &v;
-            st.push_back(pl);
-        }
-
-        pair<vector<Regex>,string> ret = parse(st, op.second);
-        cout << "Returning stack "; showvec(ret.first); cout << endl;
-        cout << "with string " << ret.second << endl;
-        return ret;
-    }
-    else if (r[0] == '(')
-    {
-        r.erase(r.begin()); vector<Regex> emp;
-        pair<vector<Regex>,string> op = parse(emp,r);
-
-        Regex p; p.reduce(op.first);
-        st.push_back(p);
-        if (op.second[0] == ')')
-        {
-            pair<vector<Regex>,string> ret = parse(st, op.second);
-            cout << "Returning stack "; showvec(ret.first); cout << endl;
-            cout << "with string " << ret.second << endl;
-            return ret;
-        }
-    }
-    else if (r[0] == ')')
-    {
-        r.erase(r.begin());
-        cout << "Closing bracket, returning stack "; showvec(st); cout << endl;
-        cout << "with r " << r << endl;
-        return make_pair(st, r);
-    }
-
-    r.erase(r.begin());
-    cout << "Otherwise returning stack "; showvec(st); cout << endl;
-    cout << "with r " << r << endl;
-    return parse(st, r);
-}
-
-int Regex::isEmpty()
-{
-    if (symb == "" && star == NULL &&
-        concat == NULL && plus == NULL)
-            return 1;
-    return 0;
-}
-int Regex::isStar() { if (star != NULL) return 1; return 0; }
-int Regex::isPlus() { if (plus != NULL) return 1; return 0; }
-int Regex::isConc() { if (concat != NULL) return 1; return 0; }
-int Regex::isChar() { if (symb != "")   return 1; return 0; }
-
-void Regex::show()
-{
-    //cout << "Showing" << endl;
-    //cout << "isEmpty() = " << isEmpty() << "; "
-    //     << "isChar() = " << isChar() << "; "
-    //     << "isStar() = " << isStar() << "; "
-    //     << "isPlus() = " << isPlus() << "; "
-    //     << "isConc() = " << isConc() << endl;
-
-    if (isEmpty() == 1) cout << "";
-    else if (isChar() == 1)
-        cout << symb;
-    else if (isStar() == 1)
-    {
-        cout << "(";
+        cout << '(';
         (*star).show();
-        cout << ")*";
+        cout << ")*";       //print sub-regex in brackets followed by *
     }
-    else if (isPlus() == 1)
+    else if (plus != NULL)
     {
-        cout << "(";
-        (*((*plus).begin())).show(); cout << " + ";
-        for (vector<Regex>::iterator it = ++(*plus).begin(); it != (*plus).end(); it++)
+        cout << '(';
+        (*((*plus).begin())).show(); //print first sub-regex
+        for (vector<Regex>::iterator it = ++((*plus).begin()); it != (*plus).end(); it++)
         {
-            (*it).show();
-            cout << "+";
+            cout << '+';            //print + followed by
+            (*it).show();           //each subseq regex
         }
-        cout << ")";
+        cout << ')';                //enclosed in brackets
     }
-    else if (isConc() == 1)
+    else if (conc != NULL)
     {
-        cout << "IsConc print" << endl;
-        cout << "Size " << (*concat).size() << endl;
-        cout << "(";
-        for (vector<Regex>::iterator it = (*concat).begin(); it != (*concat).end(); it++)
-            (*it).show();
-        cout << ")";
+        cout << '(';
+        for (vector<Regex>::iterator it = (*conc).begin(); it != (*conc).end(); it++)
+            (*it).show();           //print list of regexes
+        cout << ')';                //enclosed in brackets
     }
+    else if (symb != NULL)
+        cout << (*symb);            //single character
+    else
+        cout << "ε";                //ε
 }
 
+/*The parser function works by iterating
+  over the characters in the string.
+  Single characters are pushed on the stack;
+  for stars, the last regex is popped off, con-
+  verted to a star, and pushed back.
+  At an opening bracket, a regex containing
+  only the bracket is pushed, and the parser
+  continues. When a closing bracket is en-
+  countered, regexes are popped one by one
+  till the opening bracket is found, and they
+  are all concatenated and pushed back.
+  When a plus is found, the last regex is nested
+  in a singleton union structure and pushed back,
+  followed by a regex consisting only of a plus.
+  This acts as an indicator that more operands are
+  required.*/
+Regex parse (string s)          //Parses string into Regex datatype
+{
+    vector<Regex> stack;        //global stack to maintain list of regexes
+    Regex r(NULL, NULL, NULL, NULL);
+    char c; char* cptr; Regex* rptr; vector<Regex>* vptr;
+
+    for (int i = 0; i < s.size(); i++)      //for each character in the string
+    {
+        c = s[i];
+        if (c >= 'a' && c <= 'z')           //single character
+        {
+            cptr = new char; (*cptr) = c;
+            r = Regex(cptr, NULL, NULL, NULL);  //create regex
+            if (!stack.empty())
+            {
+                Regex last = stack.back();
+                if (last.conc != NULL && s[i+1] != '*')
+                    (last.conc)->push_back(r);
+                else if (i < s.size()-1 && ((s[i+1] >= 'a' && s[i+1] <= 'z') ||
+                                            (s[i+1] == '(') ||
+                                            (s[i+1] == 'E')) &&
+                         (s[i+1] != '*'))
+                {
+                    vptr = new vector<Regex>; vptr->push_back(r);
+                    r = Regex(NULL, NULL, NULL, vptr);
+                    stack.push_back(r);
+                }
+                else if (last.symb != NULL && *(last.symb) == '+' &&
+                         i < s.size()-1 && s[i+1] != '*')    //if plus is on top,
+                {                                            //and current regex is not
+                    stack.pop_back();                        //star, add to plus
+                    last = stack.back();
+                    (last.plus)->push_back(r);
+                }
+                else                                    //else directly push
+                    stack.push_back(r);
+            }
+            else if (i < s.size()-1 && ((s[i+1] >= 'a' && s[i+1] <= 'z') ||
+                                        (s[i+1] == '(') ||
+                                        (s[i+1] == 'E')) &&
+                     (s[i+1] != '*'))
+            {
+                vptr = new vector<Regex>; vptr->push_back(r);
+                r = Regex(NULL, NULL, NULL, vptr);
+                stack.push_back(r);
+            }
+            else
+                stack.push_back(r);
+        }
+        else if (c == 'E')          //epsilon treated similar to character
+        {
+            r = Regex(NULL, NULL, NULL, NULL);
+            if (!stack.empty())
+            {
+                Regex last = stack.back();
+                if (last.symb != NULL && *(last.symb) == '+')
+                {
+                    stack.pop_back();
+                    last = stack.back();
+                    (last.plus)->push_back(r);
+                }
+                else
+                    stack.push_back(r);
+            }
+            else
+                stack.push_back(r);
+        }
+        else if (c == '*')              //Kleene star
+        {
+            Regex last = stack.back(); stack.pop_back();    //get the last regex
+            rptr = new Regex(NULL, NULL, NULL, NULL); (*rptr) = last;
+            r = Regex(NULL, rptr, NULL, NULL);              //wrap it in a star
+            if (!stack.empty())
+            {
+                last = stack.back();
+                if (last.symb != NULL && *(last.symb) == '+')       //check for plus
+                {
+                    stack.pop_back();
+                    last = stack.back();
+                    (last.plus)->push_back(r);
+                }
+                else                                        //and push
+                    stack.push_back(r);
+            }
+            else
+                stack.push_back(r);
+        }
+        else if (c == '+')              //union
+        {
+            Regex last = stack.back();
+            if (last.plus == NULL)          //if the last regex is
+            {                               //not a union, then create
+                stack.pop_back();           //one and push it
+                vector<Regex> plus; plus.push_back(last);
+                vptr = new vector<Regex>; (*vptr) = plus;
+                r = Regex(NULL, NULL, vptr, NULL);
+                cptr = new char; (*cptr) = '+';
+                Regex p = Regex(cptr, NULL, NULL, NULL);
+                stack.push_back(r); stack.push_back(p);
+            }
+            else                            //else add to the existing union
+            {
+                cptr = new char; (*cptr) = '+';
+                Regex p = Regex(cptr, NULL, NULL, NULL);
+                stack.push_back(p);
+            }
+        }
+        else if (c == '(')              //push opening bracket
+        {
+            cptr = new char; (*cptr) = '(';
+            r = Regex(cptr, NULL, NULL, NULL);
+            stack.push_back(r);
+        }
+        else if (c == ')')              //for closing bracket
+        {
+            vector<Regex> conc;
+            Regex b = stack.back();
+            while (b.symb == NULL || *(b.symb) != '(')  //pop all regexes until
+            {                                           //opening bracket
+                conc.insert(conc.begin(), b);           //and add to conc
+                stack.pop_back(); b = stack.back();     //in reverse order
+            }
+            stack.pop_back();
+            if (conc.size() > 1)                        //if more than one,
+            {                                           //wrap in concat
+                vptr = new vector<Regex>; (*vptr) = conc;
+                r = Regex(NULL, NULL, NULL, vptr);
+            }
+            else                                        //else keep single
+                r = conc[0];
+            if (!stack.empty())
+            {
+                Regex last = stack.back();
+                if (last.symb != NULL && *(last.symb) == '+')   //check for plus
+                {
+                    stack.pop_back();
+                    last = stack.back();
+                    (last.plus)->push_back(r);
+                }
+                else
+                    stack.push_back(r);
+            }
+            else
+                stack.push_back(r);
+        }
+        else continue;
+    }
+    
+    if (stack.size() > 1)               //check for size of stack
+    {                                   //and concat or push directly
+        vptr = new vector<Regex>; (*vptr) = stack;
+        r = Regex(NULL, NULL, NULL, vptr);
+    }
+    else
+        r = stack[0];
+    return r;
+}
+
+transition trans (int, char, int); //create transition out of , x, d
 
 struct NFA
 {
@@ -231,42 +237,123 @@ struct NFA
     set<int> f;
     vector<transition> delta;
 
-    NFA (Regex);
-    void show();
+    int countS(Regex);      //counts states needed to simulate regex
+    int makeDel(int,Regex); //creates and inserts transitions
+    void getN(Regex);       //calls both above fns to make NFA
 };
 
-void NFA::show ()
+
+int NFA::countS (Regex r)
 {
-    cout << n << " " << k << " " << a << endl;
-    for (set<int>::iterator it = f.begin(); it != f.end(); it++)
-        cout << (*it) << " ";
-    cout << endl;
-    for (vector<transition>::iterator it = delta.begin(); it != delta.end(); it++)
-        cout << (*it).first.first << " "
-             << (*it).first.second << " "
-             << (*it).second << endl;
+    if (r.star != NULL)
+        return (2 + countS(*(r.star))); //done using two extra states
+    else if (r.plus != NULL)
+    {
+        int c = 0;
+        for (vector<Regex>::iterator it = (r.plus)->begin(); it != (r.plus)->end(); it++)
+            c += countS(*it);
+        return (2 + c);                 //total intermediate plus two extra
+    }
+    else if (r.conc != NULL)
+    {
+        int c = 0;
+        for (vector<Regex>::iterator it = (r.conc)->begin(); it != (r.conc)->end(); it++)
+            c += countS(*it);
+        return c;                       //strings all together
+    }
+    else return 2;                      //two states for 1 character
+}
+
+int NFA::makeDel (int i, Regex r)   //starts numbering states from i
+{                                   //and returns last number used
+    Regex s(NULL, NULL, NULL, NULL); int j;
+    if (r.star != NULL)                       //State i leads via epsilon
+    {                                         //to state i+1. From state
+        s = *(r.star);                        //i+1, the sub-regex s is
+        delta.push_back(trans(i,'E',i+1));    //recognised up to state j.
+        j = makeDel(i+1,s);                   //State j leads via epsilon
+        delta.push_back(trans(j,'E',j+1));    //to state j+1. States i and
+                                              //j+1 have epsilon transitions
+        delta.push_back(trans(i,'E',j+1));    //in both directions.
+        delta.push_back(trans(j+1,'E',i));
+        return (j+1);
+    }
+    else if (r.plus != NULL)
+    {
+        vector<int> eps;                //State i is the starting state.
+        j = i;                          //The vector eps holds the destination
+                                        //states of each sub-regex in the union.
+        for (vector<Regex>::iterator it = (r.plus)->begin(); it != (r.plus)->end(); it++)
+        {                               
+            s = *it;                    
+            delta.push_back(trans(i,'E',j+1));
+            j = makeDel(j+1, s);
+            eps.push_back(j);
+        }
+        for (vector<int>::iterator it = eps.begin(); it != eps.end(); it++)
+            delta.push_back(trans(*it,'E',j+1)); //Then each of these destination states
+        return (j+1);                              //leads via epsilon to the end state. 
+    }
+    else if (r.symb != NULL)                //A single character takes
+    {                                       //two states, a source and
+        delta.push_back(trans(i,*(r.symb),i+1));
+        return (i+1);                       //a destination.
+    }
+    else if (r.conc != NULL)
+    {
+        s = *((r.conc)->begin());           //The NFAs for each sub-regex
+        j = makeDel(i, s);                  //are attached via epsilon
+        for (vector<Regex>::iterator it = ++((r.conc)->begin()); it != (r.conc)->end(); it++)
+        {                                   //transitions from the end of
+            s = *it;                        //each to the beginning of the next.
+            delta.push_back(trans(j,'E',j+1));
+            j = makeDel(j+1, s);
+        }
+        return j;
+    }
+    else
+    {
+        delta.push_back(trans(i,'E',i+1));  //Similarly for epsilon.
+        return (i+1);
+    }
+}
+
+void NFA::getN (Regex r)
+{
+    n = makeDel(0, r); n++;     //Set all the transitions and the no. of states.
+
+    a = 1;
+    f.insert(n-1);              //One accept state which is the final one.
+
+    k = delta.size();           //No. of transitions
+
 }
 
 int main (int argc, char* argv[])
 {
-    string inp_f = argv[1], outp_f = argv[2], p;
+    string inp_f = argv[1], outp_f = argv[2], p; //Get CL args
     ifstream fin; ofstream fout;
-    fin.open(inp_f);
-    getline(fin,p);
-    cout << "Took input " << p << endl;
+    fin.open(inp_f);                             //Open input file
+    getline(fin,p);                              //Read from file
+    fin.close();                                 //Close file
+    
+    Regex r = parse(p);             //Parse regex
 
-    Regex r = Regex(p);
+    NFA m; m.getN(r);               //Construct NFA
 
-    r.show(); cout << endl;
-
-    //NFA m = NFA(r);
-
-    //m.show();
+    fout.open(outp_f);                          //Open output file
+    fout << m.n << " " << m.k << " " << m.a << endl;
+    for (set<int>::iterator it = m.f.begin(); it != m.f.end(); it++)
+        fout << (*it) << " ";
+    fout << endl;
+    for (vector<transition>::iterator it = m.delta.begin(); it != m.delta.end(); it++)
+        fout << (*it).first.first << " "
+             << (*it).first.second << " "
+             << (*it).second << endl;           //Print NFA
+    fout.close();                               //Close file
 }
 
-void showvec(vector<Regex> v)
+transition trans (int i, char x, int j)
 {
-    for (vector<Regex>::iterator it = v.begin(); it != v.end(); it++)
-        (*it).show(); cout << " ";
-    cout << endl;
+    return make_pair(make_pair(i,x),j);     //Transition from i to j on input x
 }

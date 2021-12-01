@@ -47,7 +47,7 @@ int DFA::distinguish (int qi, int qj, part p)
     //cout << "    Checking between " << qi << " and " << qj << endl;
 
     int f = 0, q1, q2;
-    for (char s = 'a'; s != 'c'; s++)                               //for each symbol in alphabet
+    for (char s = 'a'; s <= 'z'; s++)                               //for each symbol in alphabet
     {
         q1 = to_state(qi,s); q2 = to_state(qj,s);                   //get destination sets
         //cout << "    Symbol " << s << endl;
@@ -194,7 +194,7 @@ void DFA::reduce ()
             //cout << "Adding to f2" << endl;
         }
 
-        for (char x = 'a'; x < 'c'; x++)                        //for each input symbol
+        for (char x = 'a'; x <= 'z'; x++)                        //for each input symbol
         {
             j = getSetInd(to_state(s,x),p);                     //get the index of the set containing destination state
             delta2.push_back(make_pair(make_pair(i,x),j));      //make and push transition

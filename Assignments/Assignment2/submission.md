@@ -11,7 +11,21 @@ author: Abhinav S Menon
 # Problem 1
 We wish to find the number of configurations a TM with tape alphabet cardinality $\tau$ and states $Q$ can have.  
 
-We know that a TM has an infinitely long tape, and any cell can contain any symbol from $\Gamma$. Thus, it has an infinitely large configuration space.
+(assuming *configuration space* means the set of possible configurations)  
+We know that a TM has an infinitely long tape, and any cell can contain any symbol from $\Gamma$. Thus, it has infinitely many possible configurations.  
+
+(assuming *configuration space* means the set of possible TMs)  
+A TM is defined as a 7-tuple $(Q, \Sigma, \Gamma, \delta, q_0, q_\text{accept}, q_\text{reject})$. We can find the possible values this tuple can take by multiplying the number of possible values from each component.  
+
+Q and $\Gamma$ are clearly fixed.  
+
+From the constraint $\Sigma \subseteq \Gamma \ B$ ($B$ being the blank symbol), it must have $2^{\tau - 1} - 1$ possible values (as it cannot be empty).  
+
+$\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}$ is the transition function. Thus, for each value in $Q \times \Gamma$, any value in $Q \times \Gamma \times \{L, R\}$ can be assigned; this gives us $(|Q|\tau)^{2|Q| \tau}$ possible values.  
+
+Each of $q_0$ and $q_\text{accept}$ can have $|Q|$ values. Then, $q_\text{reject}$ can take any value from $Q - \{q_\text{reject}\}$, and therefore has $|Q|-1$ values.  
+
+Thus the total configuration space has size $(2^{\tau - 1} -1) \cdot \left(|Q| \tau)^{2|Q|\tau} \right) \cdot |Q|^2 \cdot (|Q| - 1)$.
 
 # Problem 2
 The Turing machine shown in Figure 1 does takes a string $w \in \{0,1\}^n, n \in \mathbb{N}$, and outputs $w^R$.  
@@ -140,7 +154,7 @@ We can show this by reduction to the halting problem. Suppose that $T$ is a TM t
 
 Let us construct a TM $H$ which takes as input an encoding $\langle M \rangle$ and a string $w$. It first constructs a TM $M'$ whose behaviour is as follows: on any input of length $n$, it simulates $M$ on $w$ for $n$ steps. If $M$ has halted, it runs $3n^2 + 2n + 3$ arbitrary steps; otherwise, it runs $4n^2$ arbitrary steps.  
 
-Now, if $M$ halts on $w$, it must do so after some finite number of steps (say $k$). Then, for all $n \geq k$, $M'$ runs in $3n^2 + 3n + 3$ time. If $M$ does not halt on $w$, then for all $n$, $M'$ runs in $4n^2$ time.  
+Now, if $M$ halts on $w$, it must do so after some finite number of steps (say $k$). Then, for all $n \geq k$, $M'$ runs in $3n^2 + 3n + 3$ time. If $M$ does not halt on $w$, then for all $n$, $M'$ runs in $4n^2 + n$ time.  
 In other words, $M'$ runs in $3n^2 + 3n + 3$ time **if and only if** $M$ halts on $w$. Therefore, we can run $T$ on $\langle M' \rangle$ and output whatever $T$ does; this solves the halting problem.  
 
 However, we know that the halting problem is undecidable; therefore such a $T$ cannot exist, and $L$ is undecidable, QED.
