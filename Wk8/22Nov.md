@@ -38,7 +38,7 @@ $$EQ_\text{TM} = \{\langle M_1, M_2 \rangle \mid L(M_1) = L(M_2)\},$$
 $$ALL_\text{TM}$$
 
 ### Closure Properties of Decidable Languages
-Recursive languages are closed under union; if $R_1$ and $R_2$ are decidable, then so is $R_1 \union R_2$. We can prove this by constructing
+Recursive languages are closed under union; if $R_1$ and $R_2$ are decidable, then so is $R_1 \cup R_2$. We can prove this by constructing
 $$\begin{split}
 M'(w) = &\text{Run } M_1(w) \text{ and } M_2(w) \\
 &\text{Accept if either accepts.} \end{split}$$
