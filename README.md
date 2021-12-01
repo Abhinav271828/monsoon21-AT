@@ -69,3 +69,11 @@ Notes and resources for the Automata Theory course at IIIT Hyderabad.
                 - Encoding
                 - Some Decidable Languages
                 - Some Undecidable Languages
+* Week 8
+    * Lecture 12 (22 November, Monday)
+        - Models of Computation
+            - Turing Machines
+                - Some Undecidable Languages (contd.)
+                - Reduction
+                - Closure Properties of Decidable Languages
+                - Closure Properties of Recognisable Languages
